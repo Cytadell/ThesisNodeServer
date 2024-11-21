@@ -1,17 +1,22 @@
 const express = require('express');
-const cors = require('cors'); // Import the CORS package
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-app.use(cors()); // Enable CORS for all routes
-app.use(express.json()); // Middleware to parse JSON bodies
+// Middleware to parse JSON bodies
+app.use(express.json());
 
-app.post('/receive-data', (req, res) => {
-    const gameData = req.body;
-    console.log("Received data:", gameData);
-    res.status(200).send("Data received successfully");
+// Define a GET route for root to avoid 404 errors
+app.get('/', (req, res) => {
+    res.send('Welcome to the Thesis Web Server!');
 });
 
+// Define the /receive-data POST route
+app.post('/receive-data', (req, res) => {
+    console.log('Received data:', req.body); // Log the received JSON data
+    res.status(200).send('Data received successfully!');
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
