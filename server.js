@@ -3,6 +3,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const simpleGit = require('simple-git'); // To manage Git commands
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,22 +24,10 @@ const storage = multer.diskStorage({
         cb(null, `${Date.now()}-${file.originalname}`); // Add timestamp to filename
     }
 });
-
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
-    fileFilter: (req, file, cb) => {
-        const allowedTypes = ['text/plain', 'application/json'];
-        if (!allowedTypes.includes(file.mimetype)) {
-            cb(new Error('Only .log, .txt, and .json files are allowed!'), false);
-        } else {
-            cb(null, true);
-        }
-    }
-});
+const upload = multer({ storage: storage });
 
 // File upload endpoint
-app.post('/upload-file', upload.single('file'), (req, res) => {
+app.post('/upload-file', upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
     }
@@ -46,24 +35,26 @@ app.post('/upload-file', upload.single('file'), (req, res) => {
     console.log('File uploaded:', req.file);
     console.log('Player Name:', req.body.playerName);
 
-    res.status(200).send('File uploaded successfully!');
-}, (err, req, res, next) => {
-    if (err instanceof multer.MulterError) {
-        return res.status(400).send(err.message); // Handle multer errors
-    } else if (err) {
-        return res.status(500).send('An error occurred while processing your request.');
+    try {
+        // Commit the file to the GitHub repository
+        const filePath = path.join(__dirname, 'uploads', req.file.filename);
+        const git = simpleGit();
+
+        await git.add(filePath); // Stage the uploaded file
+        await git.commit(`Add uploaded file: ${req.file.filename}`); // Commit the file
+        await git.push(); // Push to the GitHub repository
+
+        console.log(`File ${req.file.filename} committed and pushed to GitHub.`);
+        res.status(200).send('File uploaded and pushed to GitHub successfully!');
+    } catch (err) {
+        console.error('Error pushing to GitHub:', err);
+        res.status(500).send('Error uploading file to GitHub.');
     }
 });
 
-// Define the /receive-data POST route
-app.post('/receive-data', (req, res) => {
-    console.log('Received data:', req.body); // Log the received JSON data
-    res.status(200).send('Data received successfully!');
-});
-
-// Basic root route
+// Basic root route for testing
 app.get('/', (req, res) => {
-    res.send('Server is up and running!');
+    res.send('Server is running!');
 });
 
 // Start the server
