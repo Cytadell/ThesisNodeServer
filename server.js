@@ -43,7 +43,7 @@ http.createServer(async function (req, res) {
   const purl = urlObj.parse(req.url, true);
   const path = purl.pathname;
 
-  if (path === '/process') {
+  if (path === '/') {
     // Handle API request
     const queryValue = purl.query.query;
     const searchType = purl.query.searchType;
