@@ -14,8 +14,8 @@ async function addData(newData) {
     await client.connect();
     console.log("Connected successfully to MongoDB");
 
-    const dbo = client.db("Stock");
-    const collection = dbo.collection("PublicCompanies");
+    const dbo = client.db("ThesisData");
+    const collection = dbo.collection("GameRecords");
 
     // Insert the new data into the collection
     const result = await collection.insertOne(newData);
