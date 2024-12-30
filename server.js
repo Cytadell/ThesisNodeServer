@@ -33,6 +33,18 @@ http
 
     console.log(`Received request for path: ${path}`);
 
+    // Add CORS headers to every response
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // Allow specific methods
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type"); // Allow specific headers
+
+    if (req.method === "OPTIONS") {
+      // Handle preflight requests for CORS
+      res.writeHead(204); // No Content
+      res.end();
+      return;
+    }
+
     if (path === "/add" && req.method === "POST") {
       let body = "";
 
