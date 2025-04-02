@@ -3,7 +3,7 @@ const urlObj = require("url");
 const { MongoClient } = require("mongodb");
 
 const uri =
-  "mongodb+srv://gavinmccarthybui:hollowtest@testcluster.oaoex.mongodb.net/?retryWrites=true&w=majority&appName=TestCluster";
+  "mongodb+srv://herokuData:WiZqcsmu2cKaOd5v@testcluster.oaoex.mongodb.net/?retryWrites=true&w=majority&appName=TestCluster";
 const client = new MongoClient(uri);
 
 const PORT = process.env.PORT || 8080;
